@@ -1,0 +1,14 @@
+# C Mode
+
+HCM_lof:Generate a list of all functions.|M\Slook in this file only.|M\Alook in all files.
+HCM_updn:\Sgo to next function.|M\Ato previous function
+HCM_load:\Sload the header file under cursor.
+HCM_run:\Ssave text and send it to the c compiler.
+HCM_mak:\Ssave text and launch Make.
+HCM_go:Go to the definition of the function at cursor.|M\Slook in this file only.|M\Alook in all files.|Mcs-\Sreturn cursor to original position.
+
+Group1:Control
+Group2:Group2
+Group3:Preprocesor
+Group4:Group4
+Group5:Group5

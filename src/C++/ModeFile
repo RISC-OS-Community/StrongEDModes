@@ -1,0 +1,258 @@
+#-------------------------------------------------------------------------------
+#
+#	Name    : C++
+#	Purpose : StrongED mode file for modern C++ source files
+#	Author  : Original C Mode © StrongED Developers
+#	Author  : Modern C++ by Paolo Fabio Zaino
+#	Licence : Freeware
+#	Version : 1.00, 30-04-2023
+#
+#	Compilation may be started with F10.
+#
+#-------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+# Changes:
+# 30.04.23 PZ First commit to GitHub for others to use
+#          PZ cleaned up a bit the source
+#          PZ Syntax should handle up to C++20
+# 10.04.07 PZ Completed adding C++ Generics
+# 01.03.07 PZ First fork from original StrongED C Mode
+#-------------------------------------------------------------------------------
+
+HelpPath	DrWimpC,C-Version5,C++,C,OS,Wimp,MiscSWIs,InetSWIs,InetSocket,VDU,Toolbox,Desk,OSLib,UnixLib,
+
+Foldparm1	("/*{{{", "/*}}}", StartSpace, Case)
+FoldParm2	(FoldFunc, FoldFunc, StartOfLine, Case)
+
+#-------------------------------------------------------------------------------
+
+Search
+#	include1	[_spct] "#include" _spct "<" [_spct] @0 * @9 ".H" [_spct] ">"
+#	include2	[_spct] "#include" _spct '"' [_spct] @0 * @9 ".H" [_spct] '"'
+
+	include1	[_spct] "#include" _spct ('"') [_spct] @0 * @9 ('"')
+	include2	[_spct] "#include" _spct ('<') [_spct] @0 * @9 ('>')
+	include3	[_spct] "#include" _spct '"' [_spct] @0 * @9 ".H" [_spct] '"'
+
+	isblock		inblock .
+	iscomment	"/*"
+	wholecomment	"/*" ** "*/"
+	preprocessor_	{" "} ("include" | "ifdef" | "ifndef" | "if" | "else" | "endif" | "pragma" | "line" | "error" | "define" | "undef" | "warning" | "elif")
+	preprocessor	"#" preprocessor_
+
+	FuncType	< {{'\t *'} {\i}+ {\s} ~"("}+ {\s} {'*'} {\s}
+	FoldFunc	FuncType {"("} @0 {\i}+ {")"} {\s} {\( {" "}}+ ~";" ** \{ @9
+	Function	FuncType {"("} @0 {\i}+ @9 {")"} {\s} {\( {" "}}+ ~";" ** \{
+	GoFunction	FuncType {"("} @0 CursorWord @9 {")"} {\s} {\( {" "}}+ ~";" ** \{
+
+	Spaces		{' '}
+	Comments	{"//"}
+	_ParPrefix	< Spaces Comments @1 @2 Spaces
+	_Indent2	{" "} [ "/*" | "//" ] {" "}
+
+# expressions for smart indent
+	If		("if" {" "} "(" * ")" >)
+	Else		(["}"] {" "} "else")
+	Case		("case" * ":") | ("default" * ":")
+	IndentAfter	< {" "} ( If | Else | Case)
+	OutdentLine	< {" "} ( Else | Case)
+End
+
+#-------------------------------------------------------------------------------
+
+ClickList
+#	include1	LoadOne ("C:H.<StrongED$Tmp_MarkWord>")
+#	include2	LoadOne ("<StrongED$Tmp_FilePath>.^.H.<StrongED$Tmp_MarkWord>")
+	include1	SetTmp(include1, "StrongED$Tmp_MarkWord") Run("<StrongED$Tmp_ModePath>.Tools.LoadHdrLcl")
+	include2	SetTmp(include2, "StrongED$Tmp_MarkWord") Run("<StrongED$Tmp_ModePath>.Tools.LoadHdrGbl")
+	iscomment	NoIndent MarkWord(WholeComment) GotoBlock_End CaretLeft CaretLeft DeleteRight DeleteRight GotoBlock_Start DeleteRight DeleteRight BlockClear
+	isblock		NoIndent GotoBlock_Start "/*" GotoBlock_End "*/"
+End
+
+#-------------------------------------------------------------------------------
+
+ClickList c-Select2
+	include3	SetTmp(include3, "StrongED$Tmp_MarkWord") Run("<StrongED$Tmp_ModePath>.Tools.LoadHdr")
+End
+
+#-------------------------------------------------------------------------------
+
+ID_FirstChar	A-Za-z_
+ID_Middle	A-Za-z_0-9
+
+SyntaxOptions
+	SingleQuote	Yes
+	DoubleQuote	Yes
+	QuoteChar	\
+	QuoteQuote	No
+	SplitString	Yes
+	HexPrefix	0x
+	Functions	Spaces
+End
+
+SyntaxComment 1
+	CommentType	MultiLine
+	StartWith	/*
+	EndWith		*/
+End
+
+SyntaxComment 2
+	CommentType	OneLine
+	StartWith	//
+End
+
+SyntaxWords Group1 case
+	continue break
+	for while do
+	return goto
+	if else switch default case
+	alignas alignof catch asm
+	delete throw try
+End
+
+SyntaxWords Group2 case
+	auto register
+	static static_assert static_cast
+	dynamic_cast
+	extern inline  explicit export
+	typedef typeid typename
+	void decltype
+	short int long float double signed unsigned
+	const const_cast mutable volatile sizeof
+	struct union enum
+	new nullptr
+	bool TRUE FALSE
+	char char16_t char32_t wchar_t
+End
+
+SyntaxWords Group3 nocase EndOfExpr preprocessor_
+	#
+End
+
+SyntaxWords Group4 nocase EndAlways
+	& *
+End
+
+SyntaxWords Group5 case
+	namespace public private protected friend operator class :: ~ .
+	reinterpret_cast template this thread_local virtual using
+	virtual
+End
+
+
+## Make sure superfluous comment-end's stick out
+#
+#SyntaxWords Group6 nocase
+#	"*/"
+#End
+
+#-------------------------------------------------------------------------------
+
+SmartIndent NoCase
+	IndentSize	2
+	IndentChar	{
+	OutdentChar	}
+	IndentAfter	IndentAfter
+	OutdentLine	OutdentLine
+End
+
+#-------------------------------------------------------------------------------
+
+KeyList
+	cs-[		InsertStr("/*")
+	cs-]		InsertStr("*/")
+#	Return		Clicklist("indent")
+	c-Return	NewLine(indent,_Indent2)
+
+	cs-B		Push BlockClear() BlockMark_Continuous() GotoBracket BlockMark_Continuous() GotoBlock_Start CaretLeft BlockMark_Continuous() Pop
+
+	cs-R		ReindentText(,Force)
+	Return		ReindentText(Line,Force) NewLine()
+End
+
+#-------------------------------------------------------------------------------
+
+Functions
+	Icon		LoF
+	Menu		List of functions ‹F2
+	Help		HCM_lof
+	Key		‹F2
+	Select		ListOfC(Text)
+
+	Adjust		ListOfC(All)
+
+	‹Select		ListOfFound( Function, Text, Whole, NoLine, Case, Nosort )
+
+	‹Adjust		ListOfFound( Function, All, Whole, NoLine, Case, Nosort )
+
+	Icon		updown
+	Help		HCM_updn
+	Key 		^PgDown
+	Select		GotoNextC(Text)
+
+	Key 		^PgUp
+	Adjust		GotoPrevC(Text)
+
+	Key		^‹PgDown
+	‹Select		Push GotoNext( Function, Text, NoLine, Case)
+
+	Key		^‹PgUp
+	‹Adjust		Push GotoPrev( Function, Text, NoLine, Case)
+
+	Icon		load
+	Menu		Load H.*
+	Help		HCM_load
+#	Key		^H
+	Select		SetTmp() LoadOne("<StrongED$Tmp_FilePath>.^.H.<StrongED$Tmp_MarkWord>","C:H.<StrongED$Tmp_MarkWord>")
+
+	Icon		Run
+	Menu		Save & Compile      F10
+	Help		HCM_run
+	Key		F10
+#	Select		SaveDrag ("g++")
+	Select		SetTmp() SaveRun("taskwindow \"g++ <StrongED$Tmp_FileName> -mthrowback\" -wimpslot 16000K")
+
+	Icon		brick
+	Menu		Save & Make      ‹^F10
+	Help		HCM_mak
+	Key		^‹F10
+	Select		SetTmp() SaveDClick("<StrongED$Tmp_FilePath>.^.Makefile")
+
+	Icon		goto
+	Menu		Goto function definition
+	Help		HCM_go
+	Key		^G 1
+	Select		Push GotoFoundC(Text)
+
+	Key		^G 2
+	Adjust		Push GotoFoundC(All)
+
+	Key		^‹G 1
+	‹Select		Push GotoFound( GoFunction, Text, Whole, NoLine, Case, NoSort)
+
+	Key		^‹G 2
+	‹Adjust		Push GotoFound( GoFunction, All, Whole, NoLine, Case, NoSort )
+
+	^‹Select	Pop()
+
+	^‹Adjust	Pop()
+End
+
+#-------------------------------------------------------------------------------
+
+Shortcuts
+	w(	while (\@) {\n\i  \@\n\i}
+	f(	for (\@;\@;\@) {\n\i  \@\n\i}
+	s(	switch (\@) {\n\i  case \@\n\i}
+	p(	printf("\@");
+	i(	if(\@) \@
+	#<	#include <\@.h>\n\@
+	#"	#include "\@.h"\n\@
+	``-	/*----------------------------------------------------------------------------*/
+	``/	/*--- \@  */
+	``*	/* \@  */
+	``{	{\n\@\n}\n
+End
+
+#-------------------------------------------------------------------------------

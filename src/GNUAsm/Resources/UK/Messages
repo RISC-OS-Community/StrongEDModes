@@ -1,0 +1,16 @@
+Hobj_lof:Click to generate a list of all labels.
+Hobj_up:Click Select to go to previous label.
+Hobj_dn:Click Select to go to next label.
+Hobj_run:Click to Save & Assemble this source.
+Hobj_mak:Click Select to save and launch make file.|MClick Adjust to save and launch build file.|MClick Shift-Select to load make file.|MClick Shift-Adjust to load build file.
+Hobj_go:Select: Goto label if in this text.|MAdjust: Goto label if in any text.|MShift-Select/Shift-Adjust: Return.
+
+Group1:FPE instr
+Group2:ARM instr
+Group3:Branches
+Group4:LDM/STM
+Group5:Registers
+Group6:Shifts
+Group7:Directives
+Group8:Operators
+Group9:Built-ins

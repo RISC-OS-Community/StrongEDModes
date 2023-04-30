@@ -1,0 +1,7 @@
+Rules Include
+  fff, **.*/s
+  fff, **.s.*
+@ fff, **.h.* ; .^.s.*
+@ fff, **.hdr.* ; .^.s.*
+End
+

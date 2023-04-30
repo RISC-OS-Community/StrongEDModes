@@ -1,0 +1,14 @@
+Rules Exclude
+  fff,**.!StrongED.Defaults.Modes.**
+  fff,**.!StrED_cfg.UserPrefs.Modes.**
+End
+
+Rules Include
+  fff,**.cc.*
+  fff,**.cpp.*
+  fff,**.c++.*
+  fff,**.h.*
+  fff,**/hpp
+  fff,**/cpp
+  fff,**/cc
+End
