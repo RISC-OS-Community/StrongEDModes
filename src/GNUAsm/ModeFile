@@ -1,0 +1,263 @@
+#-------------------------------------------------------------------------------
+#
+#	Name    : GNUAsm
+#	Purpose : StrongED mode file for GNU assembler (GAS) source files
+#	Author  : Original Mode OsbAsm © Fred Graute
+#	Author  : GNUAsm Mode by Paolo Fabio Zaino
+#	Licence : Freeware
+#	Version : 1.00, 13-01-2023
+#
+#	Assembly may be started with F10.
+#
+#-------------------------------------------------------------------------------
+# 30-04-2023 Initial commit to GitHub repository
+#            Some source clean up and test
+# 13-01-2023 Initial fork from ObjAsm Mode
+#            Changed all basics from ObjAsm to GNUAsm
+#            Added all GNU ASM (ARM) supported directives and operators
+#            Started to add ARM pseudo instruction keywords
+#-------------------------------------------------------------------------------
+
+HelpPath	Assembly,Wimp,OS,MiscSWIs,INetSWIs,Toolbox,OSLib,UnixLib,
+
+ID_FirstChar	A-Za-z_$
+ID_Middle	A-Za-z_0-9
+
+#-------------------------------------------------------------------------------
+Search
+	Bchar		Alpha   |"_"|"`"
+	Bchar2		AlphaNum|"_"|"`"
+	FuncName	{Bchar {Bchar2}}+
+	MarkFunc	(".fnstart"|".FNSTART") {" "}+ FuncName
+	_MarkWord	(Bchar {Bchar2} ["%"|"$"]) | ("&" {Hex}+) | ("0x" {Hex}+) | {Digit}+
+	_MoveWord	(Bchar {Bchar2} ["%"|"$"]) | ("&" {Hex}+) | ("0x" {Hex}+) | {Digit}+
+	GoLabel		< ["|"] CW ["|"] ~Bchar2
+	Label		< Bchar {Bchar2} ":"
+	Fold_Start	Label
+	Fold_End	("MOV" * "PC,") | ("LDM" * "PC")
+	Get		[_spct] ".INCLUDE" | ".include" _spct @0 * @9 \s
+End
+
+#-------------------------------------------------------------------------------
+ClickList
+	Get		SetTmp(Get,"StrongED$Tmp_MarkWord") Run("<StrongED$Tmp_ModePath>.Tools.LoadFile") LoadOne("<StrongED$LoadFile>")
+End
+
+#-------------------------------------------------------------------------------
+SyntaxOptions
+	SingleQuote	Yes
+	DoubleQuote	Yes
+	QuoteChar	\
+	QuoteQuote	No
+	SplitString	Yes
+	HexPrefix	{"&"} | {"#&"} | {"0x"} | {"#0x"}
+	BinPrefix	{"0b"} | {"#0b"}
+End
+
+SyntaxComment 1
+	CommentType	MultiLine
+	StartWith	/*
+	EndWith		*/
+End
+
+SyntaxComment 2
+	CommentType	OneLine
+	StartWith	"@"
+End
+
+
+
+# Floating point instructions
+SyntaxWords Group1 EndOfFlt nocase
+	ABS ACS ASN ATN COS EXP LGN LOG MNF MVF NRM RND SIN SQT TAN URD
+	ADF DVF FDV FML FRD MUF POL POW RDF RMF RPW RSF SUF
+	FIX FLT RFS RFC WFC WFS
+	CMF CNF CMFE CNFE
+	LDF STF
+End
+
+# Integer instructions
+SyntaxWords Group2 EndOfAsm nocase
+	ADC ADD AND BIC CMN CMP EOR MLA MOV MUL
+	MVN ORR RSB RSC SBC SUB SWI TEQ TST
+	LDR STR
+	ADR ADRL
+# ARM3 instructions
+	SWP
+# ARM6 instructions
+	MRS MSR
+# ARM7M instructions
+	UMULL SMULL UMLAL SMLAL
+# StrongARM instructions
+#       LDRH STRH LDRSH STRSH LDRSB STRSB
+# Psudo Instructions
+	NOP
+End
+
+# Branches (both B and BL)
+SyntaxWords Group3 EndOfAsm nocase
+	B
+End
+
+# Load/Store multiple
+SyntaxWords Group4 EndOfAsm nocase
+	LDM STM
+End
+
+SyntaxWords Group5 EndNonID nocase
+	R0 R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15
+	F0 F1 F2 F3 F4 F5 F6 F7
+# APCS-R registers
+	A1 A2 A3 A4 V1 V2 V3 V4 V5 V6 SL FP IP SP LR PC
+# PSR specifiers
+	CPSR
+	CPSR_f CPSR_c CPSR_x CPSR_s
+	CPSR_fc CPSR_fx CPSR_fs CPSR_cx CPSR_cs CPSR_xs
+	CPSR_fcx CPSR_fcs CPSR_fxs CPSR_cxs
+	CPSR_fcxs
+	SPSR
+	SPSR_f SPSR_c SPSR_x SPSR_s
+	SPSR_fc SPSR_fx SPSR_fs SPSR_cx SPSR_cs SPSR_xs
+	SPSR_fcx SPSR_fcs SPSR_fxs SPSR_cxs
+	SPSR_fcxs
+End
+
+# Shift operators
+SyntaxWords Group6 EndNonID nocase
+	LSR LSL ASR ASL ROR RRX
+End
+
+# Assembler directives
+SyntaxWords Group7 EndNonID nocase
+	".2BYTE"
+	".4BYTE"
+	".8BYTE"
+	".ALIGN"
+	".ARCH"
+	".ARCH_EXTENSION"
+	".ARM"
+	".ASCII"
+	".ASCIZ"
+	".BYTE"
+	".BSS"
+	".CANTUNWIND"
+	".CODE"
+	".CPU"
+	".DATA"
+	".EABI_ATTRIBUTE"
+	".ENDM"
+	".END"
+	".EQU"
+	".EVEN"
+	".EXTEND"
+	".FILE"
+	".FNEND"
+	".FNSTART"
+	".FORCE_THUMB"
+	".FPU"
+	".GLOBAL"
+	".HANDLERDATA"
+	.IF .ELSE .ENDIF
+	".INCLUDE"
+	".INST"
+	".INST.N"
+	".INST.W"
+	".LDOUBLE"
+	".LONG"
+	".LTORG"
+	".MACRO"
+	".MOVSP"
+	".OBJECT_ARCH"
+	".PACKED"
+	".PAD"
+	".PERSONALITY"
+	".PERSONALITYINDEX"
+	".POOL"
+	".REQ"
+	".RODATA"
+	".SAVE"
+	".SETFP"
+	".SECREL32"
+	".SHORT"
+	".SYNTAX"
+	".TEXT"
+	".THUMB"
+	".THUMB_FUNC"
+	".THUMB_SET"
+	".TLSDESCSEQ"
+	".UNREQ"
+	".UNWIND_RAW"
+	".VSAVE"
+	".WORD"
+End
+
+# Expressions and operators
+SyntaxWords Group8 EndAlways case
+	"<<" ">>" "|"
+End
+
+# Built-in variables
+SyntaxWords Group9 EndAlways case
+#	{PC} .
+#	{VAR} @
+#	{OPT}
+	{TRUE}
+	{FALSE}
+#	{CONFIG}
+#	{ENDIAN}
+End
+
+#-------------------------------------------------------------------------------
+Functions
+	Key	‹F2
+	Menu	List of labels  ‹F2
+	Icon	LoF
+	Help	Hobj_lof
+	Select	ListOfFound (Label,Text,Whole,Line,Case,Sort)
+
+	Adjust	ListOfFound (Label,Text,Whole,Line,Case)
+
+	Key	F10
+	Menu	Save & Assemble     F10
+	Icon	Run
+	Help	Hobj_run
+#	Select	SaveDrag("GNUAsm")
+	Select	SetTmp() SaveRun("taskwindow \"as <StrongED$Tmp_FileName> \" -wimpslot 16000K")
+
+	Key	‹^F10
+	Menu	Save & Make      ‹^F10
+	Icon	brick
+	Help	Hobj_mak
+	Select	SetTmp() SaveDClick("<StrongED$Tmp_FilePath>.^.Makefile")
+
+	Adjust	SetTmp() SaveDClick("<StrongED$Tmp_FilePath>.^.MkGCC")
+
+	‹Select	SetTmp() LoadOne("<StrongED$Tmp_FilePath>.^.Makefile")
+
+	‹Adjust	SetTmp() LoadOne("<StrongED$Tmp_FilePath>.^.MkGCC")
+
+	Key	^G
+	Menu	Goto label
+	Icon	goto
+	Help	Hobj_go
+	Select	Push GotoFound(GoLabel,Text,Whole,Line,Case)
+
+	Key	^G 2
+	Adjust	Push GotoFound(GoLabel,All,Whole,Line,Case)
+
+	Key	^‹G
+	‹Select	Pop
+
+	Key	^‹G 2
+	‹Adjust	Pop
+End
+
+Shortcuts
+	STM{	STMFD   R13!,{R0-R12,LR}\n\n\i\@\n\n\iLDMFD   R13!,{R0-R12,PC}^
+	STMS{	STMFD   R13!,{R0-R12,LR}\n\n\i\@\n\n\iLDMFD   R13!,{R0-R12,PC}
+	LDM{	LDMFD   R13!,{R0-R12,PC}^
+	LDMS{	LDMFD   R13!,{R0-R12,PC}
+	``-	@-------------------------------------------------------------------------------\n
+	``=	@===============================================================================\n
+	``*	@*******************************************************************************\n
+End
