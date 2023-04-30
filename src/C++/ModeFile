@@ -15,7 +15,7 @@
 # Changes:
 # 30.04.23 PZ First commit to GitHub for others to use
 #          PZ cleaned up a bit the source
-#          PZ Syntax should handle up to C++21
+#          PZ Syntax should handle up to C++20
 # 10.04.07 PZ Completed adding C++ Generics
 # 01.03.07 PZ First fork from original StrongED C Mode
 #-------------------------------------------------------------------------------
