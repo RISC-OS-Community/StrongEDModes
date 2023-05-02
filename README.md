@@ -23,9 +23,11 @@ git clone this repository inside a `hostfs` directory, of your RPCEmu and then, 
 
 ```bash
 * dir  hostfs::$.<path-to-the-github-repo>.src
-* copy @.src.GNUAsm Boot:^.Apps.!StrongED.Modes
-* copy @.src.GNUCpp Boot:^.Apps.!StrongED.Modes
+* copy @.src.GNUAsm <StrongED$Dir>.Defaults.Modes.* R
+* copy @.src.GNUCpp <StrongED$Dir>.Defaults.Modes.* R
 ```
+
+Or, if you prefer to install them in your StrongED user directory, just copy both GNUAsm and GNUCpp directories to your StrongED user directory (!Str_Cfg.UserPrefs.Modes)
 
 ## Usage
 
@@ -47,5 +49,3 @@ The modes are licensed under the CDDL v1.1 license.  See the LICENSE file for mo
 ## TODO
 
 * Add support for C++23 if needed.
-
-
